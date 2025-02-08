@@ -43,7 +43,7 @@ export default {
                 if (token) {
                     localStorage.setItem('token', token);
                     axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-                    this.$router.push('/home');
+                    this.$router.push('/login');
                 } else {
                     this.errorMessage = "Échec de la connexion.";
                 }
@@ -62,15 +62,28 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100vh;
+    width: 100vw;
 }
 
 .auth-card {
-    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.363);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10.9px);
+    -webkit-backdrop-filter: blur(10.9px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     padding: 20px;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 350px;
+    width: 30vw;
+    min-width: 400px;
+    height: 40vh;
+    display: flex;
+    flex-direction: column;
+    /* align-items: center; */
+    justify-content: space-around;
+    color: white;
 }
 
 h2 {
@@ -98,7 +111,7 @@ button {
     margin-top: 15px;
     padding: 10px;
     border: none;
-    background: #007BFF;
+    background: #ff5e00;
     color: white;
     border-radius: 5px;
     cursor: pointer;

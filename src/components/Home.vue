@@ -1,26 +1,36 @@
 <template>
     <div class="home-container">
         <h1 class="title">Cocktails</h1>
-        <!-- Carte d'ajout -->
-        <div class="add-cocktail-card" @click="openCreateModal">
-            <h2>Ajouter un nouveau cocktail ➕</h2>
-        </div>
-        <!-- Liste des cocktails -->
-        <div class="cocktail-list">
+
+        <!-- Liste des cocktails défilable horizontalement -->
+        <div class="cocktail-list" ref="cocktailList">
             <div v-for="cocktail in cocktails" :key="cocktail.id" class="cocktail-card"
-    :style="cocktail.image ? { 
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), url('${cocktail.image}')`
-    } : {}">
-                <!-- <img :src="cocktail.image" alt="Cocktail" style="width: 100px; height: 100px;"> -->
-                <RouterLink :to="`/cocktail/${cocktail.id}`" class="card-link">
-                    <h2>{{ cocktail.nom }}</h2>
-                    <p>{{ cocktail.description }}</p>
-                    <p class="verre">Servi dans : {{ cocktail.verre }}</p>
-                    <p class="garniture">Garniture : {{ cocktail.garniture }}</p>
-                    <span class="details-link">Voir les détails</span>
-                </RouterLink>
+                :style="cocktail.image ? { backgroundImage: `url('${cocktail.image}')` } : {}"
+                @click="goToCocktail(cocktail.id)">
+                <h2>{{ cocktail.nom }}</h2>
+                <div class="card-detail">
+                    <RouterLink :to="`/cocktail/${cocktail.id}`" class="card-link">
+                        <p>{{ cocktail.description }}</p>
+                        <p class="garniture">Composé de {{ cocktail.garniture }}</p>
+                        <span class="details-link">Voir les détails</span>
+                    </RouterLink>
+                </div>
             </div>
         </div>
+
+        <!-- Boutons de défilement -->
+        <div class="scroll-buttons">
+            <button @click="scrollLeft" class="scroll-button">◀</button>
+            <button @click="scrollRight" class="scroll-button">▶</button>
+        </div>
+
+        <!-- Carte d'ajout -->
+        <div class="container-add-cocktail-button">
+            <button class="add-cocktail-button" @click="openCreateModal">
+                Ajouter un nouveau cocktail +
+            </button>
+        </div>
+        
         <!-- Modal de création -->
         <cocktail-create v-if="createMode" @close="closeCreateModal" @created="onCocktailCreated" />
     </div>
@@ -37,21 +47,39 @@ export default {
             cocktails: [],
             errorMessage: '',
             createMode: false,
+            autoScrollInterval: null,
         };
     },
     mounted() {
         this.fetchCocktails();
-    },
 
+        this.$nextTick(() => {
+            if (this.$refs.cocktailList) {
+                this.autoScrollInterval = setInterval(() => {
+                    this.scrollRight();
+                }, 4000);
+            }
+        });
+    },
+    // Pour Vue 2 utilisez beforeDestroy, pour Vue 3 beforeUnmount
+    // beforeDestroy() {
+    //     if (this.autoScrollInterval) {
+    //         clearInterval(this.autoScrollInterval);
+    //     }
+    // },
+    beforeUnmount() {
+        if (this.autoScrollInterval) {
+            clearInterval(this.autoScrollInterval);
+        }
+    },
     methods: {
         async fetchCocktails() {
             try {
                 const token = localStorage.getItem('token');
                 const response = await axios.get('http://localhost:3000/cocktail/all', {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${token}` },
                 });
                 this.cocktails = response.data;
-
             } catch (error) {
                 console.error("Erreur lors de la récupération des cocktails :", error);
                 this.errorMessage = "Impossible de charger les cocktails.";
@@ -63,19 +91,52 @@ export default {
         closeCreateModal() {
             this.createMode = false;
         },
+        goToCocktail(id) {
+            this.$router.push(`/cocktail/${id}`);
+        },
         onCocktailCreated() {
             this.closeCreateModal();
             this.fetchCocktails();
         },
-    }
+        scrollLeft() {
+            const container = this.$refs.cocktailList;
+            if (!container) {
+                console.warn("Le conteneur cocktailList est introuvable (scrollLeft)");
+                return;
+            }
+            container.scrollBy({ left: -500, behavior: 'smooth' });
+        },
+        scrollRight() {
+            const container = this.$refs.cocktailList;
+            if (!container) {
+                console.warn("Le conteneur cocktailList est introuvable (scrollRight)");
+                return;
+            }
+
+            const currentScroll = container.scrollLeft ?? 0;
+            const visibleWidth = container.clientWidth ?? 0;
+            const totalWidth = container.scrollWidth ?? 0;
+            if (currentScroll + visibleWidth >= totalWidth - 10) {
+                container.scrollTo({ left: 0, behavior: 'smooth' });
+            } else {
+                container.scrollBy({ left: 500, behavior: 'smooth' });
+            }
+        },
+    },
 };
 </script>
 
 <style scoped>
 .home-container {
     text-align: center;
-    padding: 20px;
     color: white;
+    width: 100vw;
+    min-height: 100vh;
+    padding-top: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 .title {
@@ -84,37 +145,27 @@ export default {
     margin-bottom: 20px;
 }
 
-.add-cocktail-card {
-    width: 580px;
-    padding: 20px;
-    margin: 0 auto 20px auto;
-    border-radius: 10px;
-    background: #00000094;
-    color: white;
-    font-weight: 900;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    text-align: center;
-    cursor: pointer;
-    border: 1px solid #000000;
-    transition: transform 0.3s;
-}
-
-.add-cocktail-card:hover {
-    transform: scale(1.05);
-}
-
 .cocktail-list {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 20px;
+    flex-wrap: nowrap;
+    /* Force une seule ligne */
+    overflow-x: auto;
+    /* Défilement horizontal */
+    scroll-behavior: smooth;
+    width: 90%;
+    padding-bottom: 10px;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.cocktail-list::-webkit-scrollbar {
+    display: none;
 }
 
 .cocktail-card {
-    width: 280px;
-    height: 300px;
-    padding: 20px;
-    border-radius: 10px;
+    flex: 0 0 calc(100% / 5);
+    height: 700px;
+    padding-top: 50px;
     background: #00000094;
     background-size: cover;
     background-position: center;
@@ -124,21 +175,31 @@ export default {
     transition: transform 0.3s;
     border: 1px solid #000000;
     display: flex;
-    align-content: space-around;
-    justify-content: center;
+    flex-direction: column;
+    justify-content: space-between;
+    margin-right: 10px;
 }
 
 .cocktail-card:hover {
-    transform: scale(1.05);
+    transform: scale(1.02);
 }
 
 .card-link {
     text-decoration: none;
     color: inherit;
     display: flex;
-    align-items: center;
-    justify-content: space-between;
     flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    width: 100%;
+}
+
+.card-detail {
+    background-color: rgba(0, 0, 0, 0.659);
+    display: flex;
+    justify-content: center;
+    padding: 10px;
+    height: 25%;
 }
 
 .cocktail-card h2 {
@@ -160,11 +221,60 @@ export default {
     color: #ff5506;
     cursor: pointer;
     text-decoration: none;
-    display: block;
     margin-top: 10px;
 }
 
 .details-link:hover {
     text-decoration: underline;
+}
+
+.scroll-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+}
+
+.scroll-button {
+    background-color: #ff5506;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s;
+}
+
+.scroll-button:hover {
+    transform: scale(1.05);
+}
+
+.container-add-cocktail-button {
+    width: 100vw;
+    display: flex;
+    justify-content: flex-end;
+    padding-right: 5%;
+    margin-top: 20px;
+}
+
+.add-cocktail-button {
+    margin: 2rem;
+    width: 280px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    border-radius: 10px;
+    background: #ff5506;
+    color: white;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    border: 1px solid #000000;
+    transition: transform 0.3s;
+}
+
+.add-cocktail-button:hover {
+    transform: scale(1.05);
 }
 </style>

@@ -3,10 +3,12 @@
         <div class="image-container" :style="{ backgroundImage: 'url(' + cocktail.image + ')' }"></div>
         <div class="details-container">
             <h1>{{ cocktail.nom }}</h1>
+            <div class="line"></div>
             <p>{{ cocktail.description }}</p>
             <p><strong>Verre :</strong> {{ cocktail.verre }}</p>
             <p><strong>Garniture :</strong> {{ cocktail.garniture }}</p>
             <p><strong>Alcoolisé :</strong> {{ cocktail.alcoolise ? 'Oui' : 'Non' }}</p>
+            <div class="line"></div>
             <div class="section" v-if="cocktail.ingredients && cocktail.ingredients.length">
                 <h2>Ingrédients</h2>
                 <ul>
@@ -23,6 +25,7 @@
                     </li>
                 </ul>
             </div>
+            <div class="line"></div>
             <div class="section" v-if="cocktail.etapes && cocktail.etapes.length">
                 <h2>Étapes de préparation</h2>
                 <ol>
@@ -73,7 +76,7 @@ export default {
 <style scoped>
 .cocktail-detail-container {
     display: flex;
-    /* background-color: #218838; */
+    justify-content: space-between;
     width: 100vw;
     min-height: 100vh;
     padding-top: 70px;
@@ -86,12 +89,12 @@ export default {
 }
 
 .details-container {
-    margin-bottom: 70px;
+    width: 50%;
     display: flex;
     justify-content: space-around;
     flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding: 200px;
     overflow-y: auto;
     color: rgb(255, 255, 255);
 }
@@ -99,6 +102,7 @@ export default {
 .details-container h1 {
     font-size: 2rem;
     margin-bottom: 10px;
+    font-weight: 900;
 }
 
 .details-container p {
@@ -106,23 +110,32 @@ export default {
     margin: 5px 0;
 }
 
+.line {
+    background-color: white;
+    width:25vw;
+    height: 1px;
+    margin: 1rem;
+
+}
 .section {
     margin-top: 20px;
+    width: 20vw
 }
 
 .section h2 {
     font-size: 1.5rem;
     margin-bottom: 10px;
+    font-weight: 500;
 }
 
 ul,
+li,
 ol {
-    margin-left: 20px;
     text-align: left;
 }
 
 .edit-btn {
-    margin-top: 20px;
+    margin-top: 80px;
     padding: 10px 20px;
     font-size: 1rem;
     background: #ff6607;

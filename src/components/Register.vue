@@ -20,7 +20,8 @@
                 <button type="submit">S'inscrire</button>
             </form>
 
-            <p>Déjà un compte ? <RouterLink to="/login">Se connecter</RouterLink></p>
+            <p>Déjà un compte ? <RouterLink to="/login">Se connecter</RouterLink>
+            </p>
         </div>
     </div>
 </template>
@@ -68,16 +69,25 @@ export default {
     justify-content: center;
     align-items: center;
     height: 100vh;
-    /* background: #f8f9fa; */
+    width: 100vw;
 }
 
 .auth-card {
-    background: rgb(0, 0, 0);
+    background: rgba(0, 0, 0, 0.363);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10.9px);
+    -webkit-backdrop-filter: blur(10.9px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
     padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     text-align: center;
-    width: 350px;
+    width: 30vw;
+    min-width: 400px;
+    height: 70vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    color: white;
 }
 
 h2 {
@@ -96,16 +106,18 @@ label {
 
 input {
     padding: 8px;
-    margin-top: 5px;
+    margin-bottom: 30px;
+    margin-top: 10px;
     border: 1px solid #ccc;
     border-radius: 5px;
 }
 
 button {
     margin-top: 15px;
+    margin-bottom: 25px;
     padding: 10px;
     border: none;
-    background: #007BFF;
+    background: #ff5e00;
     color: white;
     border-radius: 5px;
     cursor: pointer;

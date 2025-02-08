@@ -8,9 +8,10 @@ import CocktailForm from "../src/components/CocktailForm.vue";
 
 const routes = [
     { path: "/user", component: usersList, meta: { requiresAuth: true } },
-    { path: "/home", component: home, meta: { requiresAuth: true } },
+    { path: "/cocktails", component: home, meta: { requiresAuth: true } },
     { path: "/register", component: Register },
     { path: "/login", component: Login },
+    { path: "/", component: Login },
     { path: "/cocktail/:id", component: CocktailDetails, meta: { requiresAuth: true } },
     { path: "/cocktail/add", component: CocktailForm, meta: { requiresAuth: true } },
     { path: "/cocktail/edit/:id", component: CocktailForm, meta: { requiresAuth: true } },
@@ -21,14 +22,13 @@ const router = createRouter({
     routes,
 });
 
-// Vérification de l'authentification avant chaque navigation
 router.beforeEach((to, from, next) => {
     const isAuthenticated = !!localStorage.getItem("token");
 
     if (to.meta.requiresAuth && !isAuthenticated) {
-        next("/register"); // Redirige vers la page d'inscription si l'utilisateur n'est pas connecté
+        next("/login");
     } else {
-        next(); // Continue normalement
+        next();
     }
 });
 

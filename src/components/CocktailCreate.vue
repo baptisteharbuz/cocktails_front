@@ -3,6 +3,12 @@
         <div class="modal-content">
             <h2>Créer un nouveau cocktail</h2>
             <form @submit.prevent="submitForm">
+                <!-- Champ Image -->
+                <div class="image-preview" v-if="cocktail.image">
+                    <img :src="cocktail.image" alt="Aperçu de l'image" />
+                </div>
+                <label for="image">URL de l'image</label>
+                <input type="text" id="image" v-model="cocktail.image" placeholder="Lien de l'image" />
                 <!-- Champs principaux -->
                 <label for="nom">Nom</label>
                 <input type="text" id="nom" v-model="cocktail.nom" required />
@@ -22,13 +28,6 @@
                     <option :value="true">Oui</option>
                     <option :value="false">Non</option>
                 </select>
-
-                <!-- Champ Image -->
-                <label for="image">URL de l'image</label>
-                <input type="text" id="image" v-model="cocktail.image" placeholder="Lien de l'image" />
-                <div class="image-preview" v-if="cocktail.image">
-                    <img :src="cocktail.image" alt="Aperçu de l'image" />
-                </div>
 
                 <!-- Section Ingrédients -->
                 <div class="ingredients-section">
@@ -187,7 +186,6 @@ export default {
 
 <style scoped>
 .modal-overlay {
-    color: black;
     position: fixed;
     top: 0;
     left: 0;
@@ -201,12 +199,15 @@ export default {
 }
 
 .modal-content {
-    background: white;
+    background: rgba(255, 255, 255, 0.093);
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.376);
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid rgba(0, 0, 0, 0.264);
     padding: 20px;
-    border-radius: 10px;
-    width: 90%;
-    max-width: 600px;
-    max-height: 90vh;
+    width: 40vw;
+    height: 80vh;
     overflow-y: auto;
 }
 
